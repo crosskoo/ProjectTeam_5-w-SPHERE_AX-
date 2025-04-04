@@ -1,47 +1,102 @@
 <template>
   <div class="container">
     <div class="sidebar">
-      <h2>화재 이벤트</h2>
-      <div class="event">3월 17일 - 서울시 강남구 화재 발생</div>
-      <div class="event">3월 16일 - 부산시 해운대구 연기 감지</div>
-      <div class="event">3월 15일 - 강원도 속초시 산불 경보</div>
+      <div class="top">
+        <div class="fire-event-text">화재 이벤트</div>
+        <button>
+          <Icon
+            class="icon"
+            icon="iconamoon:search-fill"
+            width="24"
+            height="24"
+          />
+        </button>
+      </div>
+      <hr />
+      <div class="bottom">
+        <div class="list">
+          <div class="item on">
+            오봉산1
+            <div class="right">
+              <div>2024/10/22</div>
+              <div>12:42:02</div>
+            </div>
+          </div>
+          <div class="item">
+            오봉산2
+            <div class="right">
+              <div>2024/10/23</div>
+              <div>09:44:31</div>
+            </div>
+          </div>
+          <div class="item">
+            오봉산3
+            <div class="right">
+              <div>2024/10/24</div>
+              <div>21:39:57</div>
+            </div>
+          </div>
+        </div>
+        <div class="scrollbar"></div>
+      </div>
     </div>
 
     <div class="main">
       <div class="header">
-        <div>자동산불감지시스템</div>
-        <div class="right">asdf1234님 로그아웃</div>
+        <div class="title">자동산불감지시스템</div>
+        <div class="right">
+          asdf1234님
+          <div class="button">
+            <Icon class="icon" icon="charm:menu-kebab" />
+          </div>
+        </div>
       </div>
       <div class="main-content">
         <div class="left-content">
-          <div class="cctv">📹 CCTV 영상</div>
+          <div class="cctv-name">고봉암5</div>
+          <div class="cctv">CCTV 영상</div>
           <div class="weather">
-            <div class="weather-item">온도: 25°C</div>
-            <div class="weather-item">풍속: 5m/s</div>
-            <div class="weather-item">습도: 40%</div>
-            <div class="weather-item">화재 위험도: 높음</div>
-            <div class="weather-item">자외선 지수: 7</div>
-            <div class="weather-item">미세먼지: 보통</div>
+            <div class="weather-item">
+              <Icon class="icon" icon="icon-park-solid:wind-turbine" />풍향
+              <div class="value">6 deg</div>
+            </div>
+            <div class="weather-item">
+              <Icon class="icon" icon="mingcute:wind-fill" />풍속
+              <div class="value">1 m/s</div>
+            </div>
+            <div class="weather-item">
+              <Icon class="icon" icon="mdi:temperature" />기온
+              <div class="value">16.2 °C</div>
+            </div>
+            <div class="weather-item">
+              <Icon class="icon" icon="carbon:humidity" />습도
+              <div class="value">100.0 %</div>
+            </div>
+            <div class="weather-item">
+              <Icon class="icon" icon="fluent:weather-fog-48-regular" />강수상태
+              <div class="value">비</div>
+            </div>
+            <div class="weather-item">
+              <Icon class="icon" icon="uil:raindrops" />강수량
+              <div class="value">0.5 mm</div>
+            </div>
           </div>
         </div>
-        <div class="map">🗺️ 2D 지도</div>
+        <div class="map">2D 지도</div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'FireMonitoringSystem',
-}
+<script setup>
+import { Icon } from '@iconify/vue'
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
 }
 
 .container {
@@ -52,23 +107,87 @@ export default {
 .sidebar {
   margin: 32px;
   width: 384px;
-  background: #2c3e50;
+  background-color: $background2;
   color: white;
   margin: 16px;
   overflow-y: auto;
-  border-radius: 16px;
-}
-
-.sidebar h2 {
-  margin-bottom: 10px;
-  font-size: 18px;
-}
-
-.event {
-  padding: 10px;
-  margin-bottom: 10px;
-  background: #34495e;
-  border-radius: 5px;
+  border-radius: 8px;
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    .fire-event-text {
+      font-size: 20px;
+      margin-left: 8px;
+      text-align: left;
+    }
+    button {
+      border: none;
+      box-shadow: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background-color: $background4;
+      .icon {
+        color: $gray2;
+      }
+    }
+    button:hover {
+      background: $background3;
+      cursor: pointer;
+    }
+  }
+  hr {
+    border: none; /* 기본 선 제거 */
+    height: 2px;
+    margin-right: 16px;
+    margin-left: 16px;
+    background-color: $background3;
+  }
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+    margin: 16px;
+    .list {
+      flex: 1;
+      margin-right: 8px;
+      .item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        background: $background2;
+        border-radius: 12px;
+        height: 52px;
+        color: $gray2;
+        font-size: 16px;
+        div {
+          text-align: right;
+          font-size: 14px;
+        }
+      }
+      .item:hover {
+        background: $background3;
+        cursor: pointer;
+      }
+      .on {
+        background: $background4;
+        color: white;
+      }
+      .on:hover {
+        background: $background4;
+      }
+    }
+    .scrollbar {
+      background-color: $background4;
+      width: 8px;
+      border-radius: 8px;
+      height: 84vh;
+    }
+  }
 }
 
 .main {
@@ -76,73 +195,121 @@ export default {
   display: flex;
   flex-direction: column;
   margin-right: 16px;
-}
+  .header {
+    display: flex;
+    justify-content: space-between;
+    height: 84px;
+    color: white;
+    align-items: center;
+    .title {
+      padding: 8px;
+      font-size: 24px;
+    }
+    .right {
+      display: flex;
+      align-items: center;
+      .button {
+        margin-left: 8px;
+        height: 36px;
+        width: 36px;
+        border-radius: 8px;
+        background: $background1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-.main-content {
-  flex: 1;
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 16px;
-}
+        .icon {
+          height: 20px;
+          width: 20px;
+        }
+      }
+      .button:hover {
+        background: $background4;
+        cursor: pointer;
+      }
+    }
+  }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  height: 84px;
-  color: white;
-  align-items: center;
-}
+  .main-content {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 16px;
 
-.left-content {
-  display: flex;
-  flex-direction: column;
-}
+    .left-content {
+      display: flex;
+      flex-direction: column;
 
-.cctv {
-  display: flex;
-  width: 928px;
-  height: 522px;
-  margin-bottom: 16px;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 5px;
-  background: #ecf0f1;
-  aspect-ratio: 16 / 9;
-}
+      .cctv-name {
+        text-align: left;
+        margin-left: 8px;
+        color: $gray2;
+      }
+      .cctv {
+        display: flex;
+        width: 928px;
+        height: 522px;
+        margin-top: 4px;
+        margin-bottom: 16px;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+        background: #ecf0f1;
+        aspect-ratio: 16 / 9;
+      }
 
-.map {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  margin-left: 16px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 5px;
-  background: #bdc3c7;
-}
+      .weather {
+        display: grid;
+        flex-grow: 1;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 16px;
+        border-radius: 5px;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
 
-.weather {
-  display: grid;
-  flex-grow: 1;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 10px;
-  background: #3498db;
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-.weather-item {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 10px;
-  text-align: center;
-  font-weight: bold;
-  border-radius: 5px;
+        .weather-item {
+          display: flex;
+          text-align: center;
+          align-items: center;
+          font-size: 20px;
+          color: $gray1;
+          border-radius: 16px;
+          border: 2px solid $background4;
+
+          .icon {
+            margin-left: 32px;
+            margin-right: 24px;
+            width: 36px;
+            height: 36px;
+            color: $gray1;
+          }
+
+          .value {
+            flex: 1;
+            text-align: right;
+            margin-right: 32px;
+            font-size: 28px;
+            color: $gray2;
+          }
+        }
+      }
+    }
+
+    .map {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      margin-top: 28px;
+      margin-left: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 5px;
+      background: #bdc3c7;
+    }
+  }
 }
 </style>
