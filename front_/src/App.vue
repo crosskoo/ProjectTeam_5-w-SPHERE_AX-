@@ -4,15 +4,17 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'App',
-}
+<script setup>
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  document.documentElement.style.width = `${window.screen.width - 8}px`
+  document.documentElement.style.height = `${window.screen.height}px`
+  document.documentElement.style.overflow = 'hidden'
+})
 </script>
 
 <style lang="scss">
-@import '@/assets/styles/variables.scss';
-
 html,
 body {
   margin: 0;
@@ -21,7 +23,7 @@ body {
 }
 
 #app {
-  background-color: var(--background1);
+  background-color: $background1;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
