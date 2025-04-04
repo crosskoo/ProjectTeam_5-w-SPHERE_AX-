@@ -1,15 +1,20 @@
 var config = require('./node_config'), 
-	mongoose = require('mongoose');
-	
+    mongoose = require('mongoose');
+    
 module.exports = function(){
     
-    var db = mongoose.connect(config.db, {useNewUrlParser : true, useUnifiedTopology: true}); //DeprecationWarning: current URL string parser is deprecated, and will be removed in a future version. To use the new parser, pass option { useNewUrlParser: true } to MongoClient.connect. ??
+    var db = mongoose.connect(config.db, {useNewUrlParser : true, useUnifiedTopology: true}); 
     console.log("MongoDB ver: " + mongoose.version);	      
-    mongoose.set('useCreateIndex', true); // DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead. ??
+    mongoose.set('useCreateIndex', true); 
     
-    //require('../app/models/UserInfo.js');
-    //require('../app/models/UserLogs.js');
+    // 모델 로드
+    require('../app/models/UserInfo.js');
+    require('../app/models/UserLogs.js');
+    require('../app/models/UserRegion.js');
+    require('../app/models/RefreshToken.js');
+    require('../app/models/Region.js');
+    require('../app/models/CCTV.js');
+    require('../app/models/Event.js');
     
     return db;
 }
-
