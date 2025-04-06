@@ -21,7 +21,7 @@ module.exports = function(){
                                   origin: '*',  //소켓 통신 크로스도메인 허용
                                 }
       })
-    , UserApiRoutes = express.Router();		
+    , UserApiRoutes = express.Router();
     
     app.use(compress()); 
     app.use(bodyParser.urlencoded({limit:"50mb", extended: false}));
@@ -32,16 +32,16 @@ module.exports = function(){
       tempFileDir : 'tmp/', 
       createParentPath: true
     }));
-    app.use(passport.initialize()); 
     app.use(express.static('./public'));
     
+    app.use('/api', UserApiRoutes);
     
+    UserApiRoutes.use(APIroutesConfig.userapi);
     
-    UserApiRoutes.use(APIroutesConfig.userapi);  
-    require('../app/routes/user.api.routes')(app,UserApiRoutes);
+    require('../app/routes/auth.api.routes')(app, UserApiRoutes);
+    require('../app/routes/user.api.routes')(app, UserApiRoutes);
+    
     require('./socketio')(io);
 
-   
-	  return server;	 
-   
+    return server;	 
 }
