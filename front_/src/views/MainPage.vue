@@ -50,9 +50,9 @@
             <Icon class="icon" icon="charm:menu-kebab" />
           </div>
           <ul v-if="menuOpen" class="dropdown-menu">
-            <li @click="doAction1">메뉴 1</li>
-            <li @click="doAction2">메뉴 2</li>
-            <li @click="doAction3">메뉴 3</li>
+            <li @click="goToMain">메인</li>
+            <li @click="goToAccount">계정</li>
+            <li @click="goToLogin">로그아웃</li>
           </ul>
         </div>
       </div>
@@ -96,21 +96,23 @@
 <script setup>
 import { Icon } from '@iconify/vue'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const menuOpen = ref(false)
+const router = useRouter()
 
 function toggleMenu() {
   menuOpen.value = !menuOpen.value
 }
 
-function doAction1() {
-  console.log('메뉴 1 클릭')
+const goToMain = () => {
+  router.push('/main')
 }
-function doAction2() {
-  console.log('메뉴 2 클릭')
+const goToAccount = () => {
+  router.push('/account')
 }
-function doAction3() {
-  console.log('메뉴 3 클릭')
+const goToLogin = () => {
+  router.push('/login')
 }
 </script>
 
@@ -249,28 +251,36 @@ function doAction3() {
       }
       .button:hover {
         background: $background4;
+        cursor: pointer;
       }
       .dropdown-menu {
         position: absolute;
-        top: 30px;
+        padding: 4px 0 4px 0;
+        top: 36px;
         right: 0;
-        background-color: #2c2c2c;
-        border: 1px solid #444;
-        border-radius: 5px;
+        background-color: $background1;
+        border: 1px solid $background4;
+        border-radius: 8px;
+        box-shadow: -2px 2px 4px $background4;
         list-style: none;
-        padding: 0;
         margin: 0;
-        min-width: 120px;
         z-index: 999;
       }
       .dropdown-menu li {
-        padding: 10px;
+        width: 128px;
+        height: 32px;
+        font-size: 14px;
+        padding-left: 8px;
+        align-content: center;
+        text-align: left;
         cursor: pointer;
         color: white;
+        margin: 0 4px 0 4px;
+        border-radius: 4px;
       }
 
       .dropdown-menu li:hover {
-        background-color: #444;
+        background-color: $background4;
       }
     }
   }
