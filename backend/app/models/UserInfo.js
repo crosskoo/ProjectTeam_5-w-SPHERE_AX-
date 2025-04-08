@@ -52,12 +52,12 @@ UserSchema.index({ ID: 1 });
 UserSchema.index({ role: 1 });
 
 UserSchema.pre('save', function(next) {  
-    if (this.PASSWORD) { 
-        this.salt = crypto.randomBytes(128).toString('base64');
-        this.PASSWORD = this.hashPassword(this.PASSWORD);
+    if (this.isNew || this.isModified('PASSWORD')) { 
+      this.salt = crypto.randomBytes(128).toString('base64');
+      this.PASSWORD = this.hashPassword(this.PASSWORD);
     }
     next();
-});
+  });
 
 UserSchema.methods.hashPassword = function(PASSWORD) {  
     return crypto.createHash('sha512').update(PASSWORD + this.salt).digest('hex');
