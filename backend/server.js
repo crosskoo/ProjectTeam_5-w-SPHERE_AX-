@@ -2,13 +2,11 @@
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 var express = require('./config/express_config')
-  , mongoose = require('./config/mongoose_config')
-  , user_passport = require('./config/passport/user_passport');
+  , mongoose = require('./config/mongoose_config');
 
 mongoose();
 
 var app = express()
-  , user_passport = user_passport()
   , port = process.env.PORT || 10111;
 
 global.socketSalt = '';
