@@ -1,0 +1,5 @@
+train: /workspace/team_5/Data/images/Train_Images
+val: /workspace/team_5/Data/images/Val_Images
+
+nc : 6
+names : ['black', 'white', 'fire', 'cloud', 'fog', 'chimney']
