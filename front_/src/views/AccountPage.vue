@@ -209,6 +209,7 @@ const goToLogin = () => {
       align-content: center;
       text-indent: 12px;
       border-radius: 8px;
+      cursor: pointer;
     }
     .item:hover {
       background: $background3;
