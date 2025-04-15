@@ -3,14 +3,24 @@
     <div class="sidebar">
       <div class="top">
         <div class="fire-event-text">화재 이벤트</div>
-        <button>
-          <Icon
-            class="icon"
-            icon="iconamoon:search-fill"
-            width="24"
-            height="24"
-          />
-        </button>
+        <div class="right">
+          <button>
+            <Icon
+              class="icon"
+              icon="iconamoon:search-fill"
+              width="24"
+              height="24"
+            />
+          </button>
+          <button>
+            <Icon
+              class="icon"
+              icon="solar:calendar-bold"
+              width="24"
+              height="24"
+            />
+          </button>
+        </div>
       </div>
       <hr />
       <div class="bottom">
@@ -18,8 +28,19 @@
           <div class="item on">
             오봉산1
             <div class="right">
-              <div>2024/10/22</div>
-              <div>12:42:02</div>
+              <div class="text">
+                <div>2024/10/22</div>
+                <div>12:42:02</div>
+              </div>
+              <!-- <div class="line"></div> -->
+              <button>
+                <Icon
+                  class="icon"
+                  icon="bxs:message-square-detail"
+                  width="24"
+                  height="24"
+                />
+              </button>
             </div>
           </div>
           <div class="item">
@@ -63,27 +84,27 @@
           <div class="weather">
             <div class="weather-item">
               <Icon class="icon" icon="icon-park-solid:wind-turbine" />풍향
-              <div class="value">6 deg</div>
+              <div class="value">{{ weather.VEC }} deg</div>
             </div>
             <div class="weather-item">
               <Icon class="icon" icon="mingcute:wind-fill" />풍속
-              <div class="value">1 m/s</div>
+              <div class="value">{{ weather.WSD }} m/s</div>
             </div>
             <div class="weather-item">
               <Icon class="icon" icon="mdi:temperature" />기온
-              <div class="value">16.2 °C</div>
+              <div class="value">{{ weather.T1H }} °C</div>
             </div>
             <div class="weather-item">
               <Icon class="icon" icon="carbon:humidity" />습도
-              <div class="value">100.0 %</div>
+              <div class="value">{{ weather.REH }} %</div>
             </div>
             <div class="weather-item">
               <Icon class="icon" icon="fluent:weather-fog-48-regular" />강수상태
-              <div class="value">비</div>
+              <div class="value">{{ convertPty(weather.PTY) }}</div>
             </div>
             <div class="weather-item">
               <Icon class="icon" icon="uil:raindrops" />강수량
-              <div class="value">0.5 mm</div>
+              <div class="value">{{ weather.RN1 }} mm</div>
             </div>
           </div>
         </div>
@@ -95,11 +116,105 @@
 
 <script setup>
 import { Icon } from '@iconify/vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 const menuOpen = ref(false)
 const router = useRouter()
+
+const weather = ref({})
+const loading = ref(true)
+const error = ref(null)
+
+const serviceKey =
+  'YEEQoQsRDG68cNh610o5CkMOSqqZp4iSEW/9rnn6Lnlb5xVe2eFDp2HSpa2MzJxoY7lJbVRCcXkBZdwnRppvhA=='
+const nx = 89
+const ny = 91
+
+function getBaseDateTime() {
+  const now = new Date()
+  let baseDate = new Date(now)
+  let hour = now.getHours()
+  const minute = now.getMinutes()
+
+  if (minute < 40) {
+    hour -= 1
+    if (hour < 0) {
+      // 전날 23시로 조정
+      hour = 23
+      baseDate.setDate(baseDate.getDate() - 1)
+    }
+  }
+
+  const base_time = String(hour).padStart(2, '0') + '00'
+
+  const y = baseDate.getFullYear()
+  const m = String(baseDate.getMonth() + 1).padStart(2, '0')
+  const d = String(baseDate.getDate()).padStart(2, '0')
+  const base_date = `${y}${m}${d}`
+
+  return {
+    base_date,
+    base_time,
+  }
+}
+
+function convertPty(pty) {
+  switch (pty) {
+    case '0':
+      return '없음'
+    case '1':
+      return '비'
+    case '2':
+      return '비/눈'
+    case '3':
+      return '눈'
+    case '4':
+      return '소나기'
+    default:
+      return '-'
+  }
+}
+
+onMounted(async () => {
+  try {
+    const { base_date, base_time } = getBaseDateTime()
+
+    const url = `http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst`
+    const params = {
+      serviceKey: serviceKey,
+      pageNo: 1,
+      numOfRows: 1000,
+      dataType: 'JSON',
+      base_date,
+      base_time,
+      nx,
+      ny,
+    }
+
+    const res = await axios.get(url, { params })
+    console.log(res.data)
+    const items = res.data.response.body.items.item
+
+    const targets = ['T1H', 'WSD', 'VEC', 'REH', 'PTY', 'RN1']
+    const result = {}
+
+    for (const item of items) {
+      if (targets.includes(item.category) && !result[item.category]) {
+        result[item.category] = item.obsrValue
+      }
+    }
+    console.log(result)
+
+    weather.value = result
+  } catch (err) {
+    error.value = err.message
+    console.error('실패:', err)
+  } finally {
+    loading.value = false
+  }
+})
 
 function toggleMenu() {
   menuOpen.value = !menuOpen.value
@@ -148,13 +263,17 @@ const goToLogin = () => {
       margin-left: 8px;
       text-align: left;
     }
+    .right {
+      justify-content: right;
+    }
     button {
       border: none;
       box-shadow: none;
       width: 40px;
       height: 40px;
-      border-radius: 12px;
+      border-radius: 8px;
       background-color: $background4;
+      margin-left: 8px;
       .icon {
         color: $gray2;
       }
@@ -165,7 +284,7 @@ const goToLogin = () => {
     }
   }
   hr {
-    border: none; /* 기본 선 제거 */
+    border: none;
     height: 2px;
     margin-right: 16px;
     margin-left: 16px;
@@ -182,15 +301,48 @@ const goToLogin = () => {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px;
+        padding-left: 16px;
+        padding-right: 8px;
         background: $background2;
         border-radius: 12px;
         height: 52px;
         color: $gray2;
         font-size: 16px;
-        div {
-          text-align: right;
-          font-size: 14px;
+        .right {
+          display: flex;
+          justify-content: right;
+          justify-items: center;
+          align-items: center;
+
+          .text {
+            text-align: right;
+            font-size: 14px;
+          }
+
+          .line {
+            width: 2px;
+            height: 24px;
+            border-radius: 2px;
+            background: $background4;
+            margin-left: 8px;
+          }
+          button {
+            all: unset;
+            height: 32px;
+            width: 32px;
+            border-radius: 8px;
+            margin-left: 8px;
+
+            .icon {
+              color: $gray1;
+            }
+          }
+
+          button:hover {
+            .icon {
+              color: $gray2;
+            }
+          }
         }
       }
       .item:hover {
@@ -320,7 +472,6 @@ const goToLogin = () => {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(3, 1fr);
         gap: 16px;
-        border-radius: 5px;
         max-width: 100%;
         box-sizing: border-box;
         overflow: hidden;
