@@ -40,7 +40,8 @@ module.exports = function(){
     
     require('../app/routes/auth.api.routes')(app, UserApiRoutes);
     require('../app/routes/user.api.routes')(app, UserApiRoutes);
-    
+    require('../app/routes/region.api.routes')(app, UserApiRoutes);
+    require('../app/routes/event.api.routes')(app, UserApiRoutes);
     require('./socketio')(io);
 
     return server;	 
