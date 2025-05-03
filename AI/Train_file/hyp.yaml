@@ -1,0 +1,12 @@
+weight_decay: 0.001
+degrees: 5.0
+translate: 0.1
+scale: 0.5
+shear: 0.0
+perspective: 0.0
+flipud: 0.0
+fliplr: 0.5
+hsv_h: 0.01
+hsv_s: 0.3
+hsv_v: 0.3
+optimizer: 'SGD'
