@@ -43,6 +43,6 @@ train_option = {
 #results = model.train(**train_option)
 
 #fourth train 
-results = model.train(data='/workspace/team_5/Data/sample_data.yaml', epochs=10, patience=10, batch=32,imgsz=640)
+results = model.train(data='/workspace/team_5/Data/sample_data.yaml', epochs=50, patience=10, batch=32,imgsz=640)
 
 #results = model.predict(source='/workspace/team_5/Data/labels/Test_Images/',save=True)
