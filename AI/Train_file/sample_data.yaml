@@ -1,0 +1,5 @@
+train: /workspace/team_5/train.txt
+val: /workspace/team_5/val.txt
+
+nc : 6
+names : ['black', 'white', 'fire', 'cloud', 'fog', 'chimney']
