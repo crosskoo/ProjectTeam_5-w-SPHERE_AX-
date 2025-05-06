@@ -1,66 +1,6 @@
 <template>
   <div class="container">
-    <div class="sidebar">
-      <div class="top">
-        <div class="fire-event-text">화재 이벤트</div>
-        <div class="right">
-          <button>
-            <Icon
-              class="icon"
-              icon="iconamoon:search-fill"
-              width="24"
-              height="24"
-            />
-          </button>
-          <button>
-            <Icon
-              class="icon"
-              icon="solar:calendar-bold"
-              width="24"
-              height="24"
-            />
-          </button>
-        </div>
-      </div>
-      <hr />
-      <div class="bottom">
-        <div class="list">
-          <div class="item on">
-            오봉산1
-            <div class="right">
-              <div class="text">
-                <div>2024/10/22</div>
-                <div>12:42:02</div>
-              </div>
-              <!-- <div class="line"></div> -->
-              <button>
-                <Icon
-                  class="icon"
-                  icon="bxs:message-square-detail"
-                  width="24"
-                  height="24"
-                />
-              </button>
-            </div>
-          </div>
-          <div class="item">
-            오봉산2
-            <div class="right">
-              <div>2024/10/23</div>
-              <div>09:44:31</div>
-            </div>
-          </div>
-          <div class="item">
-            오봉산3
-            <div class="right">
-              <div>2024/10/24</div>
-              <div>21:39:57</div>
-            </div>
-          </div>
-        </div>
-        <div class="scrollbar"></div>
-      </div>
-    </div>
+    <MainSidebar />
 
     <div class="main">
       <div class="header">
@@ -81,9 +21,9 @@
         <div class="left-content">
           <div class="cctv-name">고봉암5</div>
           <div class="cctv">CCTV 영상</div>
-          <WeatherInfo />
+          <WeatherInfo ref="weatherRef" />
         </div>
-        <MapContainer />
+        <MapContainer @setCCTV="setCCTV" ref="mapRef" />
       </div>
     </div>
   </div>
@@ -91,15 +31,45 @@
 
 <script setup>
 import { Icon } from '@iconify/vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import MapContainer from '@/components/MapContainer.vue'
 import WeatherInfo from '@/components/WeatherInfo.vue'
+import MainSidebar from '@/components/MainSidebar.vue'
 
 // 페이지 이동
 const menuOpen = ref(false)
 const router = useRouter()
+
+// cctv 좌표 설정
+const coords = [
+  { lat: 37.583573, lng: 126.954631 },
+  { lat: 35.88894, lng: 128.610289 },
+  { lat: 35.886307, lng: 128.610096 },
+  { lat: 35.88525, lng: 128.614656 },
+  { lat: 35.892335, lng: 128.609352 },
+]
+
+const mapRef = ref(null)
+const weatherRef = ref(null)
+
+// cctv 연결
+const setCCTV = (data) => {
+  if (weatherRef.value) {
+    weatherRef.value.setWeatherData(data.lat, data.lng)
+  }
+}
+
+const setMarkers = () => {
+  if (mapRef.value) {
+    mapRef.value.createMarkers(coords)
+  }
+}
+
+onMounted(() => {
+  setMarkers()
+})
 
 function toggleMenu() {
   menuOpen.value = !menuOpen.value
@@ -126,129 +96,6 @@ const goToLogin = () => {
 .container {
   display: flex;
   height: 100vh;
-}
-
-.sidebar {
-  margin: 32px;
-  width: 384px;
-  background-color: $background2;
-  color: white;
-  margin: 16px;
-  overflow-y: auto;
-  border-radius: 8px;
-  .top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 16px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-    .fire-event-text {
-      font-size: 20px;
-      margin-left: 8px;
-      text-align: left;
-    }
-    .right {
-      justify-content: right;
-    }
-    button {
-      border: none;
-      box-shadow: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      background-color: $background4;
-      margin-left: 8px;
-      .icon {
-        color: $gray2;
-      }
-    }
-    button:hover {
-      background: $background3;
-      cursor: pointer;
-    }
-  }
-  hr {
-    border: none;
-    height: 2px;
-    margin-right: 16px;
-    margin-left: 16px;
-    background-color: $background3;
-  }
-  .bottom {
-    display: flex;
-    justify-content: space-between;
-    margin: 16px;
-    .list {
-      flex: 1;
-      margin-right: 8px;
-      .item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-left: 16px;
-        padding-right: 8px;
-        background: $background2;
-        border-radius: 12px;
-        height: 52px;
-        color: $gray2;
-        font-size: 16px;
-        .right {
-          display: flex;
-          justify-content: right;
-          justify-items: center;
-          align-items: center;
-
-          .text {
-            text-align: right;
-            font-size: 14px;
-          }
-
-          .line {
-            width: 2px;
-            height: 24px;
-            border-radius: 2px;
-            background: $background4;
-            margin-left: 8px;
-          }
-          button {
-            all: unset;
-            height: 32px;
-            width: 32px;
-            border-radius: 8px;
-            margin-left: 8px;
-
-            .icon {
-              color: $gray1;
-            }
-          }
-
-          button:hover {
-            .icon {
-              color: $gray2;
-            }
-          }
-        }
-      }
-      .item:hover {
-        background: $background3;
-        cursor: pointer;
-      }
-      .on {
-        background: $background4;
-        color: white;
-      }
-      .on:hover {
-        background: $background4;
-      }
-    }
-    .scrollbar {
-      background-color: $background4;
-      width: 8px;
-      border-radius: 8px;
-      height: 84vh;
-    }
-  }
 }
 
 .main {
@@ -349,6 +196,10 @@ const goToLogin = () => {
         font-weight: bold;
         background: #ecf0f1;
         aspect-ratio: 16 / 9;
+      }
+      .cctv video {
+        width: 100%;
+        height: 100%;
       }
     }
   }

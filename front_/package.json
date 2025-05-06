@@ -11,6 +11,7 @@
     "@iconify/vue": "^4.3.0",
     "axios": "^1.8.4",
     "core-js": "^3.8.3",
+    "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "vue": "^3.2.13",
     "vue-router": "^4.5.0"
@@ -38,7 +39,13 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "rules": {}
+    "rules": {},
+    "globals": {
+      "defineProps": "readonly",
+      "defineEmits": "readonly",
+      "defineExpose": "readonly",
+      "withDefaults": "readonly"
+    }
   },
   "browserslist": [
     "> 1%",

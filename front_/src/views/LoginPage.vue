@@ -2,10 +2,10 @@
   <div class="container">
     <div class="login-container">
       <h2 class="text-signin">자동산불감지시스템</h2>
-      <form class="form" @submit.prevent="goToMain">
+      <form class="form" @submit.prevent="login">
         <div class="input-group">
-          <label class="label" for="ID">ID</label>
-          <input type="text" id="username" v-model="username" required />
+          <label class="label" for="id">ID</label>
+          <input type="text" id="id" v-model="id" required />
         </div>
 
         <div class="input-group">
@@ -22,21 +22,37 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
-const username = ref('')
+const id = ref('')
 const password = ref('')
+
 const router = useRouter()
 
-const goToMain = () => {
-  router.push('/main') // 로그인 버튼 클릭 시 /main 페이지로 이동
+const login = async () => {
+  try {
+    const response = await axios.post('/api/auth/login', {
+      id: id.value,
+      password: password.value,
+    })
+
+    console.log(response.data.data.token)
+    document.cookie = `authToken=${response.data.data.token}; path=/; Secure; SameSite=Strict`
+
+    router.push('/main')
+  } catch (error) {
+    console.error('Login failed:', error)
+    alert('로그인 실패: 아이디 또는 비밀번호를 확인해주세요')
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .container {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
   height: 100vh;
   background: $background2;
 }
