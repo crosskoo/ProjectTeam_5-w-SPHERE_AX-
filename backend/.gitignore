@@ -1,1 +1,3 @@
 backend/public/*
+*.ts
+*.m3u8
