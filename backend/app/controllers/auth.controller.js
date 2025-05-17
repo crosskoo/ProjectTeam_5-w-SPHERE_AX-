@@ -81,10 +81,6 @@ exports.login = async (req, res) => {
       });
     }
     console.log('사용자 ID:', user.ID);
-    console.log('사용자 salt:', user.salt);
-    console.log('입력된 비밀번호:', password);
-    console.log('저장된 해시 비밀번호:', user.PASSWORD);
-    console.log('생성된 해시:', user.hashPassword(password));
     // 비밀번호 확인
     if (!user.authenticate(password)) {
       // 로그인 실패 기록
@@ -174,15 +170,17 @@ exports.register = async (req, res) => {
       });
     }
     
-    // 지역 ID 유효성 확인
+    // 지역 이름 유효성 확인
+    let regionId = null;
     if (region) {
-      const regionExists = await mongoose.model('Region').findById(region);
+      const regionExists = await mongoose.model('Region').findOne({ name: region });
       if (!regionExists) {
         return res.status(400).json({
           status: 'error',
           message: '존재하지 않는 지역입니다.'
         });
       }
+      regionId = regionExists._id;
     }
     
     // 새 사용자 생성
@@ -196,10 +194,10 @@ exports.register = async (req, res) => {
     await newUser.save();
     
     // 지역 연결
-    if (region) {
+    if (regionId) {
       const userRegion = new UserRegion({
         user_id: newUser._id,
-        region_id: region
+        region_id: regionId
       });
       await userRegion.save();
     }
@@ -228,7 +226,6 @@ exports.register = async (req, res) => {
     });
   }
 };
-
 // 계정 삭제
 exports.deleteUser = async (req, res) => {
   try {
@@ -287,6 +284,7 @@ exports.deleteUser = async (req, res) => {
     });
   }
 };
+
 
 // 로그아웃
 exports.logout = async (req, res) => {
