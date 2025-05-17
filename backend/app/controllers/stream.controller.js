@@ -22,6 +22,25 @@ exports.getHlsStream = async (req, res) => {
       });
     }
     
+    // 사용자 권한 확인 - 관리자가 아닌 경우 지역 접근 권한 확인
+    if (req.decoded.role !== 'admin') {
+      // 사용자의 지역 정보 가져오기
+      const UserRegion = mongoose.model('UserRegion');
+      const userRegions = await UserRegion.find({ user_id: req.decoded.id });
+      
+      // 사용자가 접근 가능한 지역 ID 목록
+      const allowedRegionIds = userRegions.map(ur => ur.region_id.toString());
+      
+      // CCTV가 사용자의 지역에 속하는지 확인
+      if (!allowedRegionIds.includes(cctv.region_id.toString())) {
+        console.log(`지역 접근 권한 없음: 사용자=${req.decoded.id}, CCTV 지역=${cctv.region_id}`);
+        return res.status(403).json({
+          status: 'error',
+          message: '이 CCTV 스트림에 접근할 권한이 없습니다.'
+        });
+      }
+    }
+    
     // HLS 스트림 폴더 경로
     const cctvIdStr = cctvId.toString();
     const hlsDir = path.join(__dirname, '../../public/streams', cctvIdStr);
@@ -132,7 +151,7 @@ exports.getHlsStream = async (req, res) => {
       res.setHeader('Content-Type', contentType);
     }
     
-    // CORS 헤더 추가 (중요)
+    // CORS 헤더 추가 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');

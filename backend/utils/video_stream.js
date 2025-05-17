@@ -91,9 +91,14 @@ const convertRtspToHls = (rtspUrl, cctvId) => {
       console.log(`[${processId}] FFmpeg stdout: ${data}`);
     });
     
-    // 표준 에러 로깅
     ffmpegProcess.stderr.on('data', (data) => {
-      console.log(`[${processId}] FFmpeg stderr: ${data}`);
+      // 프레임 진행 로그는 무시하고 중요한 오류나 경고만 기록
+      const logOutput = data.toString();
+      
+      // 프레임 진행 정보를 포함하는 일반적인 FFmpeg 로그는 무시
+      if (!logOutput.includes('frame=') && !logOutput.includes('fps=') && !logOutput.includes('Opening')) {
+        console.log(`[${processId}] FFmpeg stderr: ${logOutput}`);
+      }
     });
     
     // 프로세스 종료 처리
@@ -148,6 +153,11 @@ const convertRtspToHls = (rtspUrl, cctvId) => {
 
 // HLS 스트림 중지
 const stopHlsStream = (cctvId) => {
+  console.log(`HLS 스트림 중지 시도 (CCTV ID: ${cctvId})`);
+  
+  // cctvId가 문자열이 아니면 문자열로 변환
+  const cctvIdStr = cctvId.toString();
+  
   if (streamProcesses.has(cctvId)) {
     const { process, processId } = streamProcesses.get(cctvId);
     console.log(`[${processId}] HLS 스트림 중지 (CCTV ID: ${cctvId})`);
@@ -159,6 +169,22 @@ const stopHlsStream = (cctvId) => {
     // 상태 업데이트
     streamStatus.set(cctvId, { isActive: false });
     
+    // 스트림 디렉토리 정리 (선택 사항)
+    const hlsDir = path.join(__dirname, '../public/streams', cctvIdStr);
+    try {
+      if (fs.existsSync(hlsDir)) {
+        const files = fs.readdirSync(hlsDir);
+        files.forEach(file => {
+          if (file.endsWith('.ts')) {
+            fs.unlinkSync(path.join(hlsDir, file));
+          }
+        });
+        console.log(`[${processId}] 스트림 세그먼트 파일 정리 완료 (CCTV ID: ${cctvId})`);
+      }
+    } catch (err) {
+      console.error(`스트림 디렉토리 정리 중 오류:`, err);
+    }
+    
     return {
       cctvId,
       status: 'stopped',
@@ -166,6 +192,7 @@ const stopHlsStream = (cctvId) => {
     };
   }
   
+  console.log(`실행 중인 스트림이 없음 (CCTV ID: ${cctvId})`);
   return {
     cctvId,
     status: 'not_running',
