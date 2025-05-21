@@ -20,6 +20,7 @@ for region, files in region_files.items():
     train_real_sample.extend(sampled)
 train_synth_sample = random.sample(train_synth, len(train_real_sample) // 4)
 train_sample = train_real_sample + train_synth_sample
+train_sample = random.sample(train_sample, len(train_sample) // 10)
 train_img_list = [
     f'/workspace/team_5/Data/images/Train/{os.path.splitext(os.path.basename(f))[0]}.jpg'
     for f in train_sample
@@ -37,6 +38,7 @@ val_sample = []
 for region, files in region_files_val.items():
     sampled = random.sample(files, min(len(files), 5000))
     val_sample.extend(sampled)
+val_sample = random.sample(val_sample, len(val_sample) // 10)
 val_img_list = [
     f'/workspace/team_5/Data/images/Val/{os.path.splitext(os.path.basename(f))[0]}.jpg'
     for f in val_sample
