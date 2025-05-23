@@ -27,10 +27,12 @@ services:
    - mongodb
   networks:
    - app-network
+  restart: unless-stopped
   environment:
    - NODE_ENV=production
    - PORT=10111
    - MONGODB_URI=mongodb://mongodb:27017/tester
+
 networks:
  app-network:
   driver: bridge

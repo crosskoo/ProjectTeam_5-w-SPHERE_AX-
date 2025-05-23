@@ -46,7 +46,7 @@ exports.getEvents = async (req, res) => {
     const formattedEvents = eventsToReturn.map(event => ({
       id: event._id,
       timestamp: event.timestamp,
-      cctvId: event.cctv_id._id,
+      cctvName: event.cctv_id.name,
       region: event.region_id.name,
       status: event.status
     }));
