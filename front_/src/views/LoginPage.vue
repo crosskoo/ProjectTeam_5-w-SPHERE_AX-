@@ -23,6 +23,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { useUserStore } from '@/stores/user'
+import Cookies from 'js-cookie'
+
+const userStore = useUserStore()
 
 const id = ref('')
 const password = ref('')
@@ -30,19 +34,48 @@ const password = ref('')
 const router = useRouter()
 
 const login = async () => {
+  let user
+
   try {
     const response = await axios.post('/api/auth/login', {
       id: id.value,
       password: password.value,
     })
 
-    console.log(response.data.data.token)
     document.cookie = `authToken=${response.data.data.token}; path=/; Secure; SameSite=Strict`
+
+    user = response.data.data.user
+    user.regions = response.data.data.user.region
+      .split(',')
+      .map((s) => s.trim())
+    userStore.setUser(response.data.data.user)
+  } catch (error) {
+    console.error('Login failed:', error)
+    Cookies.remove('authToken')
+    userStore.clearUser()
+    alert('로그인 실패: 아이디 또는 비밀번호를 확인해주세요')
+  }
+
+  try {
+    const response = await axios.get('/api/regions', {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`,
+      },
+    })
+
+    const regionIds = response.data.data.regions
+      .filter((region) => user.regions.includes(region.name))
+      .map((region) => region.id)
+
+    console.log(regionIds)
+    userStore.user.regionIds = regionIds
 
     router.push('/main')
   } catch (error) {
-    console.error('Login failed:', error)
-    alert('로그인 실패: 아이디 또는 비밀번호를 확인해주세요')
+    console.error('데이터 로딩 실패:', error)
+    Cookies.remove('authToken')
+    userStore.clearUser()
+    alert('사용자 정보를 가져올 수 없습니다.')
   }
 }
 </script>

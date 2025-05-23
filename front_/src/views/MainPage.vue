@@ -13,7 +13,7 @@
           <ul v-if="menuOpen" class="dropdown-menu">
             <li @click="goToMain">메인</li>
             <li @click="goToAccount">계정</li>
-            <li @click="goToLogin">로그아웃</li>
+            <li @click="logout">로그아웃</li>
           </ul>
         </div>
       </div>
@@ -33,11 +33,14 @@
 import { Icon } from '@iconify/vue'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useLogout } from '@/composables/useLogout'
+import Cookies from 'js-cookie'
 
 import MapContainer from '@/components/MapContainer.vue'
 import WeatherInfo from '@/components/WeatherInfo.vue'
 import MainSidebar from '@/components/MainSidebar.vue'
 
+const { logout } = useLogout()
 // 페이지 이동
 const menuOpen = ref(false)
 const router = useRouter()
@@ -68,6 +71,11 @@ const setMarkers = () => {
 }
 
 onMounted(() => {
+  const token = Cookies.get('authToken')
+  if (!token) {
+    router.push('/login')
+  }
+
   setMarkers()
 })
 
@@ -80,9 +88,6 @@ const goToMain = () => {
 }
 const goToAccount = () => {
   router.push('/account')
-}
-const goToLogin = () => {
-  router.push('/login')
 }
 </script>
 
