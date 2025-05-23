@@ -132,7 +132,6 @@ const setWeatherData = async (lat, lon) => {
     const { base_date, base_time } = getBaseDateTime()
 
     const { nx, ny } = dfs_xy_conv(lat, lon)
-    console.log(nx, ny)
 
     const url = `http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst`
     const params = {
@@ -147,7 +146,6 @@ const setWeatherData = async (lat, lon) => {
     }
 
     const res = await axios.get(url, { params })
-    console.log(res.data)
     const items = res.data.response.body.items.item
 
     const targets = ['T1H', 'WSD', 'VEC', 'REH', 'PTY', 'RN1']
@@ -158,7 +156,6 @@ const setWeatherData = async (lat, lon) => {
         result[item.category] = item.obsrValue
       }
     }
-    console.log(result)
 
     weather.value = result
   } catch (err) {

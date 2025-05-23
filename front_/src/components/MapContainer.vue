@@ -6,6 +6,8 @@
 import { ref, onMounted, defineExpose, defineEmits } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+// import Cookies from 'js-cookie'
+// import axios from 'axios'
 
 import markerIconUrl from 'leaflet/dist/images/marker-icon.png'
 import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
@@ -15,6 +17,9 @@ const emit = defineEmits(['setCCTV'])
 // 지도
 const mapRef = ref(null)
 const map = ref(null)
+
+// CCTV 좌표
+//const coords = []
 
 const customIcon = L.icon({
   iconUrl: markerIconUrl,
@@ -43,12 +48,31 @@ defineExpose({
   createMarkers,
 })
 
-onMounted(() => {
-  map.value = L.map(mapRef.value).setView([35.88894, 128.610289], 13) // 서울 좌표
+onMounted(async () => {
+  map.value = L.map(mapRef.value).setView([35.88894, 128.610289], 13)
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(map.value)
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution: 'Tiles © Esri',
+    }
+  ).addTo(map.value)
+
+  // try {
+  //   const response = await axios.get('/api/cctv', {
+  //     params: {
+  //       region: '6818e2ced43fd1386011c411',
+  //     },
+  //     headers: {
+  //       Authorization: `Bearer ${Cookies.get('authToken')}`,
+  //     },
+  //   })
+  //   items.value = response.data.data.events
+  //   console.log('이벤트 목록:', items.value[0].timestamp)
+  // } catch (error) {
+  //   console.error('Login failed:', error)
+  //   alert('이벤트 불러오기 실패')
+  // }
 })
 </script>
 

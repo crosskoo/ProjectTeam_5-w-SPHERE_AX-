@@ -45,22 +45,23 @@ import { Icon } from '@iconify/vue'
 import FireEventItem from './FireEventItem.vue'
 import Cookies from 'js-cookie'
 import axios from 'axios'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
 
 const items = ref([
-  {
-    title: '경북대학교 정문',
-    date: '2025/03/12',
-    time: '21:09:55',
-    lat: 35.88894,
-    lng: 128.610289,
-  },
-  {
-    title: '경북대학교 북문',
-    date: '2025/04/03',
-    time: '08:23:50',
-    lat: 35.88894,
-    lng: 128.610289,
-  },
+  // {
+  //   region: '경북대학교 정문',
+  //   timestamp: '2025/05/05T08:45:50',
+  //   lat: 35.88894,
+  //   lng: 128.610289,
+  // },
+  // {
+  //   region: '경북대학교 북문',
+  //   timestamp: '2025/05/02T23:11:40',
+  //   lat: 35.88894,
+  //   lng: 128.610289,
+  // },
 ])
 
 const selectedIndex = ref(0)
@@ -82,17 +83,25 @@ function getTimePart(isoString) {
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/api/events', {
-      params: {
-        region: '6818e2ced43fd1386011c411',
-      },
-      headers: {
-        Authorization: `Bearer ${Cookies.get('authToken')}`,
-      },
+    const promises = userStore.user.regionIds.map((regionId) =>
+      axios.get('/api/events', {
+        params: { region: regionId },
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`,
+        },
+      })
+    )
+
+    const responses = await Promise.all(promises)
+
+    let events = []
+    responses.forEach((res) => {
+      events.push(...res.data.data.events)
     })
 
-    items.value = response.data.data.events
-    console.log('이벤트 목록:', items.value[0].timestamp)
+    items.value = events
+
+    console.log('이벤트 목록:', items.value)
   } catch (error) {
     console.error('Login failed:', error)
     alert('이벤트 불러오기 실패')

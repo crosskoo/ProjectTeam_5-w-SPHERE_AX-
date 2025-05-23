@@ -10,7 +10,7 @@
         <ul v-if="menuOpen" class="dropdown-menu">
           <li @click="goToMain">메인</li>
           <li @click="goToAccount">계정</li>
-          <li @click="goToLogin">로그아웃</li>
+          <li @click="logout">로그아웃</li>
         </ul>
       </div>
     </div>
@@ -19,65 +19,193 @@
         <button
           class="item on"
           :class="{ active: activeTab === 1 }"
-          @click="activeTab = 1"
+          @click="setActiveTab(1)"
         >
           프로필
         </button>
         <button
           class="item"
           :class="{ active: activeTab === 2 }"
-          @click="activeTab = 2"
+          @click="setActiveTab(2)"
         >
           계정 생성
         </button>
         <button
           class="item"
           :class="{ active: activeTab === 3 }"
-          @click="activeTab = 3"
+          @click="setActiveTab(3)"
         >
           계정 삭제
+        </button>
+        <button
+          class="item"
+          :class="{ active: activeTab === 4 }"
+          @click="setActiveTab(4)"
+        >
+          지역 관리
+        </button>
+        <button
+          class="item"
+          :class="{ active: activeTab === 5 }"
+          @click="setActiveTab(5)"
+        >
+          CCTV 관리
         </button>
       </div>
       <div class="content-container">
         <div class="content" v-if="activeTab === 1">
           <div class="input-group">
-            <label class="label" for="Phone Number">전화번호</label>
-            <input type="text" id="use2rname" required />
+            <label class="label" for="user-name">사용자 이름</label>
+            <input type="text" id="user-name" v-model="userName" required />
+          </div>
+          <div class="input-group">
+            <label class="label" for="phone-number">전화번호</label>
+            <input
+              type="tel"
+              id="phone-number"
+              v-model="phoneNumber"
+              required
+            />
           </div>
           <div class="input-group">
             <label class="label" for="email">이메일</label>
-            <input type="text" id="u6sername" required />
+            <input type="email" id="email" v-model="email" required />
           </div>
+          <button @click="updateProfile">프로필 수정</button>
         </div>
         <div class="content" v-else-if="activeTab === 2">
           <div class="input-group">
-            <label class="label" for="Phone Number">Id</label>
-            <input type="text" id="username" required />
+            <label class="label" for="create-id">아이디</label>
+            <input type="text" id="create-id" v-model="createId" required />
           </div>
           <div class="input-group">
-            <label class="label" for="email">Password</label>
-            <input type="password" id="username2" required />
+            <label class="label" for="create-password">비밀번호</label>
+            <input
+              type="password"
+              id="create-password"
+              v-model="createPassword"
+              required
+            />
           </div>
           <div class="input-group">
-            <label class="label" for="Phone Number">지역</label>
-            <input type="text" id="usernam3e" required />
+            <label class="label" for="password-check">비밀번호 확인</label>
+            <input
+              type="password"
+              id="password-check"
+              v-model="passwordCheck"
+              required
+            />
           </div>
           <div class="input-group">
-            <label class="label" for="email">권한</label>
-            <input type="text" id="use4rname" required />
+            <label class="label" for="create-user-name">사용자 이름</label>
+            <input
+              type="text"
+              id="create-user-name"
+              v-model="createUserName"
+              required
+            />
           </div>
-          <button class="btn-create">계정 생성</button>
+          <div class="input-group">
+            <label class="label" for="region">지역</label>
+            <input type="text" id="region" v-model="region" required />
+          </div>
+          <div class="input-group">
+            <label class="label" for="role">권한</label>
+            <input type="text" id="role" v-model="role" required />
+          </div>
+          <button @click="createAccount">계정 생성</button>
         </div>
         <div class="content" v-else-if="activeTab === 3">
           <div class="input-group">
-            <label class="label" for="Phone Number">Id</label>
-            <input type="text" id="useadsfrname" required />
+            <label class="label" for="delete-user-id">아이디</label>
+            <input
+              type="text"
+              id="delete-user-id"
+              v-model="deleteUserId"
+              required
+            />
+          </div>
+          <button @click="deleteAccount">계정 삭제</button>
+        </div>
+        <div class="content" v-else-if="activeTab === 4">
+          <div class="input-group">
+            <label class="label" for="add-region-name">지역명</label>
+            <input
+              type="text"
+              id="add-region-name"
+              v-model="addRegionName"
+              required
+            />
+          </div>
+          <button @click="addRegion">지역 추가</button>
+          <div class="input-group">
+            <label class="label" for="del-region-name">지역명</label>
+            <input
+              type="text"
+              id="del-region-name"
+              v-model="delRegionName"
+              required
+            />
+          </div>
+          <button @click="delRegion">지역 삭제</button>
+        </div>
+        <div class="content" v-else-if="activeTab === 5">
+          <div class="input-group">
+            <label class="label" for="add-cctv-name">CCTV 이름</label>
+            <input
+              type="text"
+              id="add-cctv-name"
+              v-model="addCCTVName"
+              required
+            />
           </div>
           <div class="input-group">
-            <label class="label" for="email">Password</label>
-            <input type="password" id="usfasdername2" required />
+            <label class="label" for="add-stream-url">stream url</label>
+            <input
+              type="url"
+              id="add-stream-url"
+              v-model="addStreamUrl"
+              required
+            />
           </div>
-          <button class="btn-create">계정 삭제</button>
+          <div class="input-group">
+            <label class="label" for="add-cctv-lat">CCTV 위도</label>
+            <input
+              type="number"
+              id="add-cctv-lat"
+              v-model="addCCTVLat"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label class="label" for="add-cctv-lng">CCTV 경도</label>
+            <input
+              type="number"
+              id="add-cctv-lng"
+              v-model="addCCTVLng"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label class="label" for="add-cctv-region">지역명</label>
+            <input
+              type="text"
+              id="add-cctv-region"
+              v-model="addCCTVRegion"
+              required
+            />
+          </div>
+          <button @click="addCCTV">CCTV 추가</button>
+          <div class="input-group">
+            <label class="label" for="del-cctv-name">CCTV 이름</label>
+            <input
+              type="text"
+              id="del-cctv-name"
+              v-model="delCCTVname"
+              required
+            />
+          </div>
+          <button @click="delCCTV">CCTV 삭제</button>
         </div>
       </div>
     </div>
@@ -86,12 +214,264 @@
 
 <script setup>
 import { Icon } from '@iconify/vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import Cookies from 'js-cookie'
+import axios from 'axios'
+import { useLogout } from '@/composables/useLogout'
 
 const activeTab = ref(1)
 const menuOpen = ref(false)
 const router = useRouter()
+
+const userName = ref('')
+const phoneNumber = ref('')
+const email = ref('')
+const createId = ref('')
+const createUserName = ref('')
+const createPassword = ref('')
+const passwordCheck = ref('')
+const region = ref('')
+const role = ref('')
+const deleteUserId = ref('')
+const addRegionName = ref('')
+const delRegionName = ref('')
+const addCCTVName = ref('')
+const addStreamUrl = ref('')
+const addCCTVLat = ref('')
+const addCCTVLng = ref('')
+const addCCTVRegion = ref('')
+const delCCTVname = ref('')
+
+const { logout } = useLogout()
+
+const updateProfile = async () => {
+  try {
+    const response = await axios.put(
+      '/api/users/profile',
+      {
+        name: userName.value,
+        email: email.value,
+        phone: phoneNumber.value,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`,
+        },
+      }
+    )
+    console.log('프로필 수정 성공:', response.data)
+    alert('프로필 수정 성공')
+  } catch (error) {
+    console.error('프로필 수정 실패:', error)
+    alert('프로필 수정 실패 입력 양식을 확인해주세요')
+  }
+}
+
+const createAccount = async () => {
+  if (createPassword.value === passwordCheck.value) {
+    try {
+      const response = await axios.post(
+        '/api/auth/admin/register',
+        {
+          id: createId.value,
+          password: createPassword.value,
+          name: createUserName.value,
+          region: region.value,
+          role: role.value,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`,
+          },
+        }
+      )
+      console.log('계정 생성 성공:', response.data)
+      alert('계정 생성 성공')
+    } catch (error) {
+      console.error('계정 생성 실패:', error)
+      alert('계정 생성 실패')
+    }
+  } else {
+    alert('비밀번호가 일치하지 않습니다.')
+  }
+}
+
+const deleteAccount = async () => {
+  try {
+    const response = await axios.delete(
+      `/api/auth/admin/users/${deleteUserId.value}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`,
+        },
+      }
+    )
+    console.log('계정 삭제 성공:', response.data)
+    alert('계정 삭제 성공')
+  } catch (error) {
+    console.error('계정 삭제 실패:', error)
+    alert('계정 삭제 실패')
+  }
+}
+
+const addRegion = async () => {
+  console.log('입력지역명: ', addRegionName.value)
+
+  try {
+    const response = await axios.post(
+      `/api/regions`,
+      {
+        name: addRegionName.value,
+        bounds: {
+          northeast: {
+            lat: 0,
+            lng: 0,
+          },
+          southwest: {
+            lat: 0,
+            lng: 0,
+          },
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`,
+        },
+      }
+    )
+    console.log('지역 추가 성공:', response.data)
+    alert('지역 추가 성공')
+  } catch (error) {
+    console.error('지역 추가 실패:', error)
+    alert('지역 추가 실패')
+  }
+}
+
+const delRegion = async () => {
+  console.log(delRegionName.value)
+
+  try {
+    let response = await axios.get(`/api/regions`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`,
+      },
+    })
+
+    console.log('response: ', response.data.data.regions)
+    let regionId = response.data.data.regions.find(
+      (region) => region.name === delRegionName.value
+    )?.id
+
+    response = await axios.delete(`/api/regions/${regionId}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`,
+      },
+    })
+
+    console.log('지역 삭제 성공:', response.data)
+    alert('지역 삭제 성공')
+  } catch (error) {
+    console.error('지역 삭제 실패:', error)
+    alert('지역 삭제 실패')
+  }
+}
+
+const addCCTV = async () => {
+  console.log('addCCTV: ', addCCTVName.value)
+
+  try {
+    let response = await axios.get(`/api/regions`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`,
+      },
+    })
+
+    console.log('response: ', response.data.data.regions)
+    let regionId = response.data.data.regions.find(
+      (region) => region.name === addCCTVRegion.value
+    )?.id
+
+    response = await axios.post(
+      `/api/cctv`,
+      {
+        name: addCCTVName.value,
+        streamUrl: addStreamUrl.value,
+        location: {
+          lat: addCCTVLat.value,
+          lng: addCCTVLng.value,
+        },
+        region_id: regionId,
+        status: 'active',
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`,
+        },
+      }
+    )
+    console.log('CCTV 추가 성공:', response.data)
+    alert('CCTV 추가 성공')
+  } catch (error) {
+    console.error('CCTV 추가 실패:', error)
+    alert('CCTV 추가 실패')
+  }
+}
+
+const delCCTV = async () => {
+  console.log(delCCTVname.value)
+
+  try {
+    let response = await axios.get(`/api/cctv`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`,
+      },
+    })
+
+    console.log('response: ', response.data.data.cctvs)
+    let cctvId = response.data.data.cctvs.find(
+      (cctv) => cctv.name === delCCTVname.value
+    )?.id
+
+    response = await axios.delete(`/api/cctv/${cctvId}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`,
+      },
+    })
+
+    console.log('cctv 삭제 성공:', response.data)
+    alert('cctv 삭제 성공')
+  } catch (error) {
+    console.error('cctv 삭제 실패:', error)
+    alert('cctv 삭제 실패')
+  }
+}
+
+onMounted(async () => {
+  const token = Cookies.get('authToken')
+  if (!token) {
+    router.push('/login')
+  }
+
+  try {
+    const response = await axios.get('/api/users/profile', {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`,
+      },
+    })
+    console.log('프로필 데이터:', response.data.data.user)
+    userName.value = response.data.data.user.name
+    phoneNumber.value = response.data.data.user.phone
+    email.value = response.data.data.user.email
+  } catch (error) {
+    console.error('Login failed:', error)
+    alert('이벤트 불러오기 실패')
+  }
+})
+
+function setActiveTab(tabIndex) {
+  activeTab.value = tabIndex
+}
 
 function toggleMenu() {
   menuOpen.value = !menuOpen.value
@@ -102,9 +482,6 @@ const goToMain = () => {
 }
 const goToAccount = () => {
   router.push('/account')
-}
-const goToLogin = () => {
-  router.push('/login')
 }
 </script>
 
@@ -241,6 +618,8 @@ const goToLogin = () => {
         cursor: pointer;
         height: 36px;
         margin-top: 16px;
+        margin-left: 4px;
+        margin-bottom: 32px;
         width: 96px;
       }
       button:hover {
