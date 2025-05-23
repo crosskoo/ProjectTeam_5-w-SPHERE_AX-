@@ -25,7 +25,8 @@ exports.getCCTVs = async (req, res) => {
       id: cctv._id,
       name: cctv.name,
       region: cctv.region_id.name,
-      status: cctv.status
+      status: cctv.status,
+      location: cctv.location // 위치 좌표 추가 (lat, lng 포함)
     }));
     
     res.status(200).json({
