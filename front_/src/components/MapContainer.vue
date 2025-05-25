@@ -6,8 +6,8 @@
 import { ref, onMounted, defineExpose, defineEmits } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-// import Cookies from 'js-cookie'
-// import axios from 'axios'
+import Cookies from 'js-cookie'
+import axios from 'axios'
 
 import markerIconUrl from 'leaflet/dist/images/marker-icon.png'
 import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
@@ -32,14 +32,18 @@ const customIcon = L.icon({
 
 map.value = null
 
-const createMarkers = (coords) => {
-  coords.forEach((coord) => {
-    const marker = L.marker([coord.lat, coord.lng], { icon: customIcon }).addTo(
-      map.value
-    )
+const createMarkers = (cctvs) => {
+  cctvs.forEach((cctv) => {
+    const marker = L.marker([cctv.location.lat, cctv.location.lng], {
+      icon: customIcon,
+    }).addTo(map.value)
 
     marker.on('click', () => {
-      emit('setCCTV', { lat: coord.lat, lng: coord.lng })
+      emit('setCCTV', {
+        lat: cctv.location.lat,
+        lng: cctv.location.lng,
+        name: cctv.name,
+      })
     })
   })
 }
@@ -58,21 +62,18 @@ onMounted(async () => {
     }
   ).addTo(map.value)
 
-  // try {
-  //   const response = await axios.get('/api/cctv', {
-  //     params: {
-  //       region: '6818e2ced43fd1386011c411',
-  //     },
-  //     headers: {
-  //       Authorization: `Bearer ${Cookies.get('authToken')}`,
-  //     },
-  //   })
-  //   items.value = response.data.data.events
-  //   console.log('이벤트 목록:', items.value[0].timestamp)
-  // } catch (error) {
-  //   console.error('Login failed:', error)
-  //   alert('이벤트 불러오기 실패')
-  // }
+  try {
+    const response = await axios.get('/api/cctv', {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`,
+      },
+    })
+
+    createMarkers(response.data.data.cctvs)
+  } catch (error) {
+    console.error('cctv 위치 불러오기 실패:', error)
+    alert('cctv 위치 불러오기 실패')
+  }
 })
 </script>
 
