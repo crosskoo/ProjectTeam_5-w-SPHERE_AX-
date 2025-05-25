@@ -6,7 +6,7 @@
       <div class="header">
         <div class="title">자동산불감지시스템</div>
         <div class="right">
-          asdf1234님
+          {{ username }}님
           <div class="button" @click="toggleMenu">
             <Icon class="icon" icon="charm:menu-kebab" />
           </div>
@@ -19,7 +19,7 @@
       </div>
       <div class="main-content">
         <div class="left-content">
-          <div class="cctv-name">고봉암5</div>
+          <div class="cctv-name">{{ cctvName }}</div>
           <div class="cctv">CCTV 영상</div>
           <WeatherInfo ref="weatherRef" />
         </div>
@@ -40,19 +40,25 @@ import MapContainer from '@/components/MapContainer.vue'
 import WeatherInfo from '@/components/WeatherInfo.vue'
 import MainSidebar from '@/components/MainSidebar.vue'
 
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
+
+const username = userStore.user?.name
+const cctvName = ref('')
+
 const { logout } = useLogout()
 // 페이지 이동
 const menuOpen = ref(false)
 const router = useRouter()
 
 // cctv 좌표 설정
-const coords = [
-  { lat: 37.583573, lng: 126.954631 },
-  { lat: 35.88894, lng: 128.610289 },
-  { lat: 35.886307, lng: 128.610096 },
-  { lat: 35.88525, lng: 128.614656 },
-  { lat: 35.892335, lng: 128.609352 },
-]
+// const coords = [
+//   { lat: 37.583573, lng: 126.954631 },
+//   { lat: 35.88894, lng: 128.610289 },
+//   { lat: 35.886307, lng: 128.610096 },
+//   { lat: 35.88525, lng: 128.614656 },
+//   { lat: 35.892335, lng: 128.609352 },
+// ]
 
 const mapRef = ref(null)
 const weatherRef = ref(null)
@@ -62,13 +68,15 @@ const setCCTV = (data) => {
   if (weatherRef.value) {
     weatherRef.value.setWeatherData(data.lat, data.lng)
   }
+
+  cctvName.value = data?.name
 }
 
-const setMarkers = () => {
-  if (mapRef.value) {
-    mapRef.value.createMarkers(coords)
-  }
-}
+// const setMarkers = () => {
+//   if (mapRef.value) {
+//     mapRef.value.createMarkers(coords)
+//   }
+// }
 
 onMounted(() => {
   const token = Cookies.get('authToken')
@@ -76,7 +84,7 @@ onMounted(() => {
     router.push('/login')
   }
 
-  setMarkers()
+  // setMarkers()
 })
 
 function toggleMenu() {
@@ -187,6 +195,7 @@ const goToAccount = () => {
       .cctv-name {
         text-align: left;
         margin-left: 8px;
+        height: 24px;
         color: $gray2;
       }
       .cctv {

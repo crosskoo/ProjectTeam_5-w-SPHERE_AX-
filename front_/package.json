@@ -11,6 +11,7 @@
     "@iconify/vue": "^4.3.0",
     "axios": "^1.8.4",
     "core-js": "^3.8.3",
+    "element-plus": "^2.9.11",
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "pinia": "^3.0.2",
