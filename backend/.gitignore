@@ -4,3 +4,4 @@ backend/public/*
 development.js
 production.js
 ./config/env/*
+*.jpg
