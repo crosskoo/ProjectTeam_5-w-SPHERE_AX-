@@ -34,6 +34,17 @@ app.listen(port, function (err) {
             console.error("스트림 초기화 실패:", e);
           }
         }, 5000); // 서버 시작 후 5초 대기 (데이터베이스 연결 확인을 위해)
+        
+        // 카카오 토큰 갱신 스케줄러 시작
+        setTimeout(() => {
+          try {
+            const tokenRefreshScheduler = require('./app/services/token_refresh_scheduler');
+            tokenRefreshScheduler.start();
+            console.log("카카오 토큰 갱신 스케줄러가 시작되었습니다.");
+          } catch (e) {
+            console.error("토큰 스케줄러 시작 실패:", e);
+          }
+        }, 10000); // 서버 시작 후 10초 대기
       }
     });
     

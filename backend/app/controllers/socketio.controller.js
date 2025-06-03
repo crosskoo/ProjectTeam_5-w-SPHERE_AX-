@@ -4,9 +4,14 @@ const mongoose = require('mongoose');
 const Event = mongoose.model('Event');
 const CCTV = mongoose.model('CCTV');
 const Region = mongoose.model('Region');
+const UserInfo = mongoose.model('UserInfo');
+const UserRegion = mongoose.model('UserRegion');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+
+// 카카오톡 알림 서비스 추가
+const kakaoNotificationService = require('../services/kakao_notification_service');
 
 // 이미지 저장 유틸리티 함수
 const saveEventImage = (base64Image, eventId) => {
@@ -79,6 +84,62 @@ const saveEventImage = (base64Image, eventId) => {
       return resolve(null);
     }
   });
+};
+
+// 카카오톡 알림 전송 함수
+const sendKakaoNotifications = async (eventData) => {
+  try {
+    console.log('카카오톡 알림 전송 시작:', eventData.region);
+    
+    // 해당 지역의 사용자들 조회
+    let targetUsers = [];
+    
+    if (eventData.regionId) {
+      // 해당 지역 담당 사용자들 조회
+      const userRegions = await UserRegion.find({ region_id: eventData.regionId })
+        .populate('user_id');
+      
+      targetUsers = userRegions
+        .map(ur => ur.user_id)
+        .filter(user => user && user.canReceiveKakaoNotification() && user.notificationSettings.fireDetection);
+    }
+    
+    // 관리자 사용자들도 포함
+    const adminUsers = await UserInfo.find({ 
+      role: 'admin',
+      'notificationSettings.kakaoEnabled': true,
+      'notificationSettings.fireDetection': true
+    });
+    
+    // 중복 제거하여 합치기
+    const allTargetUsers = [...targetUsers, ...adminUsers.filter(admin => 
+      !targetUsers.some(user => user._id.toString() === admin._id.toString())
+    )];
+    
+    console.log(`카카오톡 알림 대상 사용자 수: ${allTargetUsers.length}`);
+    
+    if (allTargetUsers.length === 0) {
+      console.log('카카오톡 알림을 받을 사용자가 없습니다.');
+      return;
+    }
+    
+    // 화재 감지 메시지 생성
+    const messageData = kakaoNotificationService.createFireDetectionMessage(eventData);
+    
+    // 알림 전송
+    const results = await kakaoNotificationService.sendToMultipleUsers(allTargetUsers, messageData);
+    
+    console.log('카카오톡 알림 전송 결과:', results);
+    
+    // 전송 결과 로깅
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.filter(r => !r.success).length;
+    
+    console.log(`카카오톡 알림 전송 완료: 성공 ${successCount}건, 실패 ${failCount}건`);
+    
+  } catch (err) {
+    console.error('카카오톡 알림 전송 중 오류:', err);
+  }
 };
 
 // AI 서버로부터 이벤트 처리 함수
@@ -157,7 +218,7 @@ const processDetectionEvent = async (data) => {
     });
     
     // 이벤트 데이터 구성 (전체 정보 포함)
-    return {
+    const eventData = {
       eventId: newEvent._id,
       cctvId: cctvId,
       cctvName: cctv.name,
@@ -171,6 +232,13 @@ const processDetectionEvent = async (data) => {
       boundingBox: newEvent.boundingBox,
       metadata: newEvent.metadata
     };
+    
+    // 카카오톡 알림 전송 (비동기로 실행하여 응답 지연 방지)
+    setImmediate(() => {
+      sendKakaoNotifications(eventData);
+    });
+    
+    return eventData;
   } catch (err) {
     console.error('감지 이벤트 처리 오류:', err);
     return null;
@@ -212,7 +280,6 @@ module.exports = function(io, socket) {
         let regionNames = [];
         
         if (decoded.role !== 'admin') {
-          const UserRegion = mongoose.model('UserRegion');
           const userRegions = await UserRegion.find({ user_id: decoded.id }).populate('region_id');
           
           console.log(`사용자 ${decoded.ID}의 지역 정보:`, userRegions.map(ur => ({
@@ -367,6 +434,38 @@ module.exports = function(io, socket) {
           status: data.status,
           timestamp: new Date()
         }
+      });
+    }
+  });
+
+  // 테스트용 카카오 알림 전송
+  socket.on('test_kakao_notification', async (data) => {
+    if (!socket.authenticated || socket.userRole !== 'admin') {
+      return socket.emit('error', { message: '관리자만 테스트 알림을 보낼 수 있습니다.' });
+    }
+    
+    try {
+      const testEventData = {
+        eventId: 'test-' + Date.now(),
+        cctvName: '테스트 CCTV',
+        region: '테스트 지역',
+        timestamp: new Date(),
+        confidence: 0.95,
+        status: 'new',
+        imageUrl: null
+      };
+      
+      await sendKakaoNotifications(testEventData);
+      
+      socket.emit('test_notification_sent', {
+        success: true,
+        message: '테스트 알림이 전송되었습니다.'
+      });
+    } catch (err) {
+      console.error('테스트 알림 전송 오류:', err);
+      socket.emit('test_notification_sent', {
+        success: false,
+        message: '테스트 알림 전송에 실패했습니다.'
       });
     }
   });
