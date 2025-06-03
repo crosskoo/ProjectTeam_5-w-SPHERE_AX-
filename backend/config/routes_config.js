@@ -4,7 +4,8 @@ var config = require('./node_config')
 // 인증이 필요 없는 경로 목록
 const PUBLIC_PATHS = [
   '/auth/login',
-  '/auth/refresh'
+  '/auth/refresh',
+  '/auth/kakao/callback'
 ];
  
 exports.userapi = function(req, res, next) { 
