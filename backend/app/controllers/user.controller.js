@@ -42,7 +42,18 @@ exports.getProfile = async (req,res) => {
           email: user.email || '',
           phone: user.phone || '',
           role: user.role,
-          region: regions
+          region: regions,
+          // 알림 설정 정보 추가
+          notificationSettings: user.notificationSettings || {
+            kakaoEnabled: false,
+            emailEnabled: true,
+            fireDetection: true,
+            systemAlerts: true,
+            urgentOnly: false
+          },
+          // 카카오 연동 상태 정보 추가
+          kakaoConnected: user.isKakaoTokenValid ? user.isKakaoTokenValid() : false,
+          kakaoTokenExpiresAt: user.kakaoTokenExpiresAt
         }
       }
     });
@@ -117,6 +128,42 @@ exports.updateProfile = async(req, res) => {
   }
 };
 
+// 알림 설정 조회
+exports.getNotificationSettings = async (req, res) => {
+  try {
+    const userId = req.decoded.id;
+    
+    const user = await userInfo.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: 'error',
+        message: '사용자를 찾을 수 없습니다.'
+      });
+    }
+    
+    res.status(200).json({
+      status: 'success',
+      data: {
+        notificationSettings: user.notificationSettings || {
+          kakaoEnabled: false,
+          emailEnabled: true,
+          fireDetection: true,
+          systemAlerts: true,
+          urgentOnly: false
+        },
+        kakaoConnected: user.isKakaoTokenValid ? user.isKakaoTokenValid() : false,
+        kakaoTokenExpiresAt: user.kakaoTokenExpiresAt
+      }
+    });
+  } catch (err) {
+    console.error('알림 설정 조회 에러:', err);
+    res.status(500).json({
+      status: 'error',
+      message: '서버 오류가 발생했습니다.'
+    });
+  }
+};
+
 
 exports.userLogs = (req, res) => {
   const result = req.body.test;
@@ -126,4 +173,3 @@ exports.userLogs = (req, res) => {
 exports.userInfo = (req, res) => {
   res.status(200).send('wkit get Method');
 };
-
