@@ -43,6 +43,7 @@ const createMarkers = (cctvs) => {
         lat: cctv.location.lat,
         lng: cctv.location.lng,
         name: cctv.name,
+        id: cctv.id,
       })
     })
   })

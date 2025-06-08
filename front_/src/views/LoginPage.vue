@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <div class="login-container">
-      <h2 class="text-signin">자동산불감지시스템</h2>
+      <h2 class="text-signin">Auto Wildfire Detection</h2>
+      <p class="subtitle">실시간 인공지능 산불 감지 서비스</p>
       <form class="form" @submit.prevent="login">
         <div class="input-group">
           <label class="label" for="id">ID</label>
@@ -13,7 +14,7 @@
           <input type="password" id="password" v-model="password" required />
         </div>
 
-        <button type="submit">Sign In</button>
+        <button type="submit">LogIn</button>
       </form>
     </div>
   </div>
@@ -87,25 +88,34 @@ const login = async () => {
   justify-content: center;
 
   height: 100vh;
-  background: $background2;
+  background: $background1;
 }
 
 .login-container {
-  width: 480px;
-  height: 600px;
+  width: 400px;
   background: $background2;
-  border-radius: 32px;
+  border-radius: 16px;
   text-align: center;
+  outline-color: $background3;
+  border: 1px solid $background3;
   align-content: center;
-  box-shadow: 0 4px 16px $background1;
+  // box-shadow: 0 4px 16px $background1;
 
   .text-signin {
-    color: white;
-    font-size: 28px;
+    margin-top: 32px;
+    margin-bottom: 0px;
+    color: $point1;
+    font-size: 30px;
+  }
+
+  .subtitle {
+    margin-top: 8px;
+    font-size: 16px;
+    color: $gray1;
   }
 
   .form {
-    margin-top: 96px;
+    margin-top: 24px;
   }
 
   .input-group {
@@ -125,11 +135,11 @@ const login = async () => {
       width: 100%;
       height: 48px;
       font-size: 16px;
-      background: $background1;
+      background: $background3;
       border: none;
       border-radius: 8px;
       margin-top: 8px;
-      border: 2px solid $background1;
+      border: 2px solid $background3;
       color: $gray2;
       font-size: 16px;
       padding: 0px 16px;
@@ -143,9 +153,7 @@ const login = async () => {
   button {
     width: calc(100% - 64px);
     height: 48px;
-    margin-left: 32px;
-    margin-right: 32px;
-    margin-top: 48px;
+    margin: 24px 32px 32px 32px;
     font-weight: bold;
     font-size: 20px;
     font-family: 'Noto Sans', sans-serif;

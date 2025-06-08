@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="header">
-      <div class="title">자동산불감지시스템</div>
+      <div class="title">설정</div>
       <div class="right">
         asdf1234님
         <div class="button" @click="toggleMenu">
@@ -9,7 +9,7 @@
         </div>
         <ul v-if="menuOpen" class="dropdown-menu">
           <li @click="goToMain">메인</li>
-          <li @click="goToAccount">계정</li>
+          <li @click="goToAccount">설정</li>
           <li @click="logout">로그아웃</li>
         </ul>
       </div>
@@ -23,6 +23,8 @@
         >
           프로필
         </button>
+        <hr class="divider" />
+        <p class="caption">관리자</p>
         <button
           class="item"
           :class="{ active: activeTab === 2 }"
@@ -503,7 +505,7 @@ const goToAccount = () => {
 
   .title {
     margin-left: 32px;
-    padding: 8px;
+    padding: 640px;
     font-size: 24px;
   }
   .right {
@@ -534,13 +536,13 @@ const goToAccount = () => {
     }
     .dropdown-menu {
       position: absolute;
-      padding: 4px 0 4px 0;
+      padding: 8px 0 8px 0;
       top: 36px;
       right: 0;
       background-color: $background1;
-      border: 1px solid $background4;
+      border: 1px solid $background2;
       border-radius: 8px;
-      box-shadow: -2px 2px 4px $background4;
+      box-shadow: 0px 2px 4px $background1;
       list-style: none;
       margin: 0;
       z-index: 999;
@@ -554,12 +556,12 @@ const goToAccount = () => {
       text-align: left;
       cursor: pointer;
       color: white;
-      margin: 0 4px 0 4px;
+      margin: 0 8px 0 8px;
       border-radius: 4px;
     }
 
     .dropdown-menu li:hover {
-      background-color: $background4;
+      background-color: $background2;
     }
   }
 }
@@ -575,6 +577,21 @@ const goToAccount = () => {
     height: 100%;
     width: 192px;
     padding-top: 64px;
+
+    .divider {
+      // margin: 20px auto;
+      width: 100%;
+      height: 1px;
+      background-color: $background4; /* 구분선 색상 */
+      border: none;
+    }
+    .caption {
+      text-align: left;
+      padding-left: 12px;
+      margin-bottom: 4px;
+      font-size: 14px;
+      color: $gray1;
+    }
 
     .item {
       all: unset;
@@ -621,6 +638,10 @@ const goToAccount = () => {
         margin-left: 4px;
         margin-bottom: 32px;
         width: 96px;
+        user-select: none;
+        -webkit-user-select: none; /* Safari */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE/Edge */
       }
       button:hover {
         background: $point2;

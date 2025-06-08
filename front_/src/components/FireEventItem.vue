@@ -58,6 +58,7 @@ import axios from 'axios'
 
 const props = defineProps({
   id: String,
+  cctvId: String,
   title: String,
   date: String,
   time: String,
@@ -66,7 +67,7 @@ const props = defineProps({
 
 const detail = ref({})
 
-const emit = defineEmits(['click'])
+const emit = defineEmits(['set-cctv'])
 const isExpanded = ref(false)
 
 const toggleExpand = async () => {
@@ -88,7 +89,10 @@ const toggleExpand = async () => {
 }
 
 const handleClick = () => {
-  emit('click')
+  emit('set-cctv', {
+    name: props.title,
+    id: props.cctvId,
+  })
 }
 </script>
 

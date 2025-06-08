@@ -31,12 +31,14 @@
     <div class="bottom">
       <div class="list">
         <FireEventItem
+          @set-cctv="setCCTV"
           v-for="(item, index) in filteredItems"
           :key="index"
           :isSelected="selectedIndex === index"
           @click="selectItem(index)"
           :id="item.id"
           :title="item.cctvName"
+          :cctvId="item.cctvId"
           :date="getDatePartKST(item.timestamp)"
           :time="getTimePartKST(item.timestamp)"
         />
@@ -47,8 +49,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-// import { ElMessage } from 'element-plus'
+import { ref, onMounted, watch, defineEmits } from 'vue'
 import FireEventItem from './FireEventItem.vue'
 import Cookies from 'js-cookie'
 import axios from 'axios'
@@ -75,9 +76,15 @@ const items = ref([
 const filteredItems = ref([])
 const selectedIndex = ref(0)
 
+const emit = defineEmits(['setCCTV'])
+
 watch(dateRange, () => {
   filterItems()
 })
+
+const setCCTV = (data) => {
+  emit('setCCTV', data)
+}
 
 const filterItems = () => {
   const text = searchText.value.trim().toLowerCase()
@@ -122,7 +129,7 @@ const getTimePartKST = (isoString) => {
   return date.toTimeString().split(' ')[0]
 }
 
-onMounted(async () => {
+const getEventData = async () => {
   try {
     const promises = userStore.user.regionIds.map((regionId) =>
       axios.get('/api/events', {
@@ -142,13 +149,18 @@ onMounted(async () => {
 
     items.value = events
     items.value.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-    filteredItems.value = items.value
+    filterItems()
 
     console.log('이벤트 목록:', items.value)
   } catch (error) {
     console.error('Login failed:', error)
     alert('이벤트 불러오기 실패')
   }
+}
+defineExpose({ getEventData })
+
+onMounted(async () => {
+  getEventData()
 })
 </script>
 
@@ -201,6 +213,7 @@ onMounted(async () => {
     }
 
     .search-input {
+      outline: none;
       width: 100%;
       height: 32px;
       padding: 4px 36px 4px 12px;
@@ -212,8 +225,10 @@ onMounted(async () => {
       font-size: 14px;
       box-sizing: border-box;
     }
+    .search-input:hover {
+      border-color: $gray0;
+    }
     .search-input:focus {
-      outline: none;
       border-color: $gray1;
     }
 
