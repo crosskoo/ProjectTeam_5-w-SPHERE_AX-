@@ -3,7 +3,7 @@
     <div class="header">
       <div class="title">설정</div>
       <div class="right">
-        asdf1234님
+        {{ username }}님
         <div class="button" @click="toggleMenu">
           <Icon class="icon" icon="charm:menu-kebab" />
         </div>
@@ -221,10 +221,16 @@ import { useRouter } from 'vue-router'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import { useLogout } from '@/composables/useLogout'
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
+
+const username = userStore.user?.name
 
 const activeTab = ref(1)
 const menuOpen = ref(false)
 const router = useRouter()
+
+const isDisabled = ref(true)
 
 const userName = ref('')
 const phoneNumber = ref('')
@@ -465,9 +471,11 @@ onMounted(async () => {
     userName.value = response.data.data.user.name
     phoneNumber.value = response.data.data.user.phone
     email.value = response.data.data.user.email
+
+    if (response.data.data.user.role === 'admin') isDisabled.value = false
   } catch (error) {
-    console.error('Login failed:', error)
-    alert('이벤트 불러오기 실패')
+    console.error('프로필 불러오기 실패:', error)
+    alert('프로필 불러오기 실패')
   }
 })
 

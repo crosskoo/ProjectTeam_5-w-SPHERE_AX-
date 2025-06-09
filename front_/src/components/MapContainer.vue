@@ -38,6 +38,12 @@ const createMarkers = (cctvs) => {
       icon: customIcon,
     }).addTo(map.value)
 
+    marker.bindTooltip(cctv.name, {
+      permanent: false, // true면 항상 보임
+      direction: 'bottom', // 툴팁 방향 (top, bottom, left, right, center 등)
+      offset: [0, 10], // 툴팁 위치 미세 조정 (픽셀 단위)
+    })
+
     marker.on('click', () => {
       emit('setCCTV', {
         lat: cctv.location.lat,
@@ -70,7 +76,12 @@ onMounted(async () => {
       },
     })
 
-    createMarkers(response.data.data.cctvs)
+    const cctvs = response.data.data.cctvs
+    if (cctvs.length > 0) {
+      map.value.setView([cctvs[0].lat, cctvs[0].lng], 14)
+    }
+
+    createMarkers(cctvs)
   } catch (error) {
     console.error('cctv 위치 불러오기 실패:', error)
     alert('cctv 위치 불러오기 실패')

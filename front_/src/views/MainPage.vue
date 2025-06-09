@@ -205,10 +205,10 @@ const setCCTV = async (data) => {
 }
 
 // 이벤트 알림 수신
-const handleNotificationEvent = (cctvName) => {
+const handleNotificationEvent = (data) => {
   ElNotification({
     title: '화재 발생',
-    message: cctvName,
+    message: data.cctvName,
     type: 'warning', // success | warning | error | info
     duration: 0, // 5초 후 자동 종료 (0이면 무한)
     position: 'top-left',
@@ -216,6 +216,7 @@ const handleNotificationEvent = (cctvName) => {
   })
 
   mainSidebar?.value.getEventData()
+  setCCTV({ id: data.cctvId, name: data.cctvName })
 }
 
 onMounted(() => {
@@ -241,12 +242,12 @@ onMounted(() => {
     console.log('소켓 연결 끊김')
   })
 
-  socket.on('some-event', (data) => {
+  socket.on('event-detected', (data) => {
     console.log('서버에서 받은 이벤트:', data)
-    handleNotificationEvent(data?.data.cctvName)
+    handleNotificationEvent(data?.data)
   })
   // 이벤트 수신 테스트
-  handleNotificationEvent('부산 CCTV 1')
+  // handleNotificationEvent('부산 CCTV 1')
 })
 
 onBeforeUnmount(() => {
@@ -299,7 +300,7 @@ const goToAccount = () => {
       padding: 8px;
       font-size: 28px;
       font-weight: 600;
-      color: $point1;
+      color: white;
     }
     .right {
       display: flex;
