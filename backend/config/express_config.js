@@ -83,6 +83,7 @@ module.exports = function(){
   require('../app/routes/cctv.api.routes')(app, UserApiRoutes);
   require('../app/routes/event.api.routes')(app, UserApiRoutes);
   require('../app/routes/stream.api.routes')(app, UserApiRoutes);
+  require('../app/routes/cctv_block.api.routes')(app, UserApiRoutes);
   
   // 카카오 알림 라우트 추가
   require('../app/routes/kakao.api.routes')(app, UserApiRoutes);

@@ -1,7 +1,5 @@
 backend/public/*
 *.ts
 *.m3u8
-development.js
-production.js
 ./config/env/*
 *.jpg

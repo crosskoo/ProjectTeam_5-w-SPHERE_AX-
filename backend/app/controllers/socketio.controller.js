@@ -9,6 +9,7 @@ const UserRegion = mongoose.model('UserRegion');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const rateLimiter = require('../services/event_rate_limiter');
 
 // 카카오톡 알림 서비스 추가
 const kakaoNotificationService = require('../services/kakao_notification_service');
@@ -347,62 +348,59 @@ module.exports = function(io, socket) {
   
   // AI 서버로부터 감지 이벤트 수신
   socket.on('detection_event', async (data) => {
-    // 클라이언트 타입 검사 - AI 서버만 이벤트를 처리하도록 제한
+    // 클라이언트 타입 검사
     if (socket.handshake.query.client !== 'ai-server') {
       console.warn(`비AI서버 클라이언트(${socket.id})가 detection_event를 시도함`);
       return;
     }
     
     console.log('AI 서버로부터 감지 이벤트 수신:', data.streamUrl);
-    console.log('이미지 데이터 존재 여부:', !!data.imageData);
-    if (data.imageData) {
-      console.log('이미지 데이터 길이:', data.imageData.length);
+    
+    // CCTV 정보 조회
+    const cctv = await CCTV.findOne({ streamUrl: data.streamUrl });
+    if (!cctv) {
+      console.error(`CCTV를 찾을 수 없음: ${data.streamUrl}`);
+      return socket.emit('detection_processed', { success: false, message: 'CCTV not found' });
     }
     
-    // 이벤트 처리
+    const cctvId = cctv._id.toString();
+    
+    // 레이트 리미터 확인
+    if (!rateLimiter.isAllowed(cctvId)) {
+      const status = rateLimiter.getStatus(cctvId);
+      console.log(`CCTV ${cctv.name} 이벤트 차단됨 (${status.remainingTime}초 남음)`);
+      
+      return socket.emit('detection_processed', {
+        success: false,
+        blocked: true,
+        remainingTime: status.remainingTime,
+        message: `이벤트가 차단되었습니다. ${status.remainingTime}초 후 재시도하세요.`
+      });
+    }
+    
+    // 정상 이벤트 처리
     const eventData = await processDetectionEvent(data);
     
     if (eventData) {
-      // 이벤트 처리 성공
-      console.log('이벤트 처리 완료, 이벤트 ID:', eventData.eventId);
-      
-      // 해당 지역 소켓에 이벤트 알림 전송
+      // 알림 전송
       if (eventData.region) {
-        const roomName = `region:${eventData.region}`;
-        console.log(`이벤트 알림 전송 대상 방: ${roomName}`);
-        
-        // 해당 방의 소켓 수 확인
-        const room = io.sockets.adapter.rooms.get(roomName);
-        const roomSize = room ? room.size : 0;
-        console.log(`방 ${roomName}의 현재 소켓 수: ${roomSize}`);
-        
-        // 지역 이름을 사용하여 소켓 룸에 알림 전송
-        io.to(roomName).emit('event_detected', {
+        io.to(`region:${eventData.region}`).emit('event_detected', {
           type: 'event_detected',
           data: eventData
         });
-        
-        console.log(`지역 ${eventData.region}에 이벤트 알림 전송됨 (ID: ${eventData.eventId})`);
       }
       
-      // 관리자에게 항상 알림
-      console.log('관리자에게 이벤트 알림 전송 중...');
       io.to('role:admin').emit('event_detected', {
         type: 'event_detected',
         data: eventData
       });
       
-      // 응답
       socket.emit('detection_processed', {
         success: true,
         eventId: eventData.eventId,
-        data: eventData // 전체 이벤트 데이터 응답에 포함
+        data: eventData
       });
-      
-      console.log(`이벤트 처리 완료 (ID: ${eventData.eventId})`);
     } else {
-      // 이벤트 처리 실패
-      console.error('이벤트 처리 실패');
       socket.emit('detection_processed', {
         success: false,
         message: '이벤트 처리 중 오류가 발생했습니다.'

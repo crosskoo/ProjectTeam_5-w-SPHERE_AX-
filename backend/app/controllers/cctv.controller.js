@@ -204,6 +204,9 @@ exports.updateCCTV = async (req, res) => {
           message: '유효한 RTSP 스트림 URL을 입력해주세요.'
         });
       }
+      else {
+        cctv.streamUrl = streamUrl;
+      }
     }
     
     // 위치 정보 업데이트
