@@ -57,7 +57,8 @@ var EventSchema = new Schema({
     },
     notified: {
         type: Boolean,
-        default: false
+        default: false,
+        required: true
     },
     created: {
         type: Date,
@@ -75,5 +76,9 @@ EventSchema.index({ cctv_id: 1 });
 EventSchema.index({ region_id: 1, timestamp: -1 });
 // 상태별 이벤트 검색을 위한 인덱스
 EventSchema.index({ status: 1 });
+// 알림 전송 여부별 검색을 위한 인덱스
+EventSchema.index({ notified: 1 });
+// CCTV별 알림 전송 여부 검색을 위한 복합 인덱스
+EventSchema.index({ cctv_id: 1, notified: 1 });
 
 mongoose.model('Event', EventSchema);
